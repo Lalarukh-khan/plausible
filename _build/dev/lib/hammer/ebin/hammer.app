@@ -1,0 +1,10 @@
+{application,hammer,
+             [{applications,[kernel,stdlib,elixir,logger,runtime_tools,
+                             poolboy]},
+              {description,"A rate-limiter with plugable backends."},
+              {modules,['Elixir.Hammer','Elixir.Hammer.Application',
+                        'Elixir.Hammer.Backend','Elixir.Hammer.Backend.ETS',
+                        'Elixir.Hammer.Supervisor','Elixir.Hammer.Utils']},
+              {registered,[]},
+              {vsn,"6.0.0"},
+              {mod,{'Elixir.Hammer.Application',[]}}]}.

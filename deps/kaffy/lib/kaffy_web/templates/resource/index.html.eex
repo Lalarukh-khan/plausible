@@ -1,0 +1,127 @@
+<div class="col-lg-12 grid-margin stretch-card">
+  <div class="card shadow mb-4">
+    <div class="card-header">
+      <div class="row justify-content-between">
+        <div class="col-auto mr-auto">
+          <h3>
+            <%= Kaffy.ResourceAdmin.plural_name(@my_resource) %><br/>
+            <span class="badge badge-secondary">(~ <%= @filtered_count %> records)</span>
+            <div id="checkbox-selected-count" class="checkbox-selected-count float-right"></div>
+          </h3>
+        </div>
+        <div class="col-auto">
+          <%= link to: Kaffy.Utils.router().kaffy_resource_path(@conn, :new, @context, @resource), class: "btn btn-outline-primary" do %>
+            <i class="fas fa-plus"></i>
+            New <%= Kaffy.ResourceAdmin.singular_name(@my_resource) %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body table-responsive w-100">
+      <div class="card-description">
+        <div class="row">
+
+          <div class="col-auto mr-auto">
+            <input id="kaffy-search-field" type="text" name="search" value="<%= Map.get(@params, "search", "") %>" class="form-control bg-transparent" placeholder="Search <%= Kaffy.ResourceAdmin.plural_name(@my_resource) %>...">
+          </div>
+
+          <div class="col-auto">
+            <%= if list_actions = Kaffy.ResourceAdmin.list_actions(@my_resource, @conn) do %>
+              <div class="btn-group">
+                <button type="button" class="btn dropdown-toggle btn-sm btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fas fa-wrench"></i> <span class="d-none d-md-inline">Actions</span>
+                </button>
+                <div class="dropdown-menu">
+                  <%= for {action_key, options} <- list_actions do %>
+                      <% extra_inputs = Map.get(options, :inputs, []) %>
+                      <%= if !Enum.empty?(extra_inputs) do %>
+                        <button type="button" data-toggle="modal" class="dropdown-item" data-target="#<%= action_key %>_modal">
+                          <%= options.name %>
+                        </button>
+                      <% else %>
+                        <%= form_tag(Kaffy.Utils.router().kaffy_resource_path(@conn, :list_action, @context, @resource, to_string(action_key)), method: :post, class: "list-action", id: "#{action_key}_form") %>
+                          <input type="submit" name="submit" value="<%= options.name %>" class="dropdown-item kaffy-list-action-submit" id="<%= action_key %>_submit" />
+                        </form>
+                      <% end %>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <%= render KaffyWeb.ResourceView, "_table.html", conn: @conn, fields: @fields, context: @context, resource: @resource, my_resource: @my_resource, entries: @entries, params: @params %>
+    </div>
+
+    <div class="index-pagination">
+    <% params = Map.to_list(@params) |> Enum.map(fn {k, v} -> {String.to_existing_atom(k), v} end) %>
+      <nav aria-label="index-list-navigation">
+        <ul class="pagination">
+          <li class="page-item <%= @prev_class %>">
+            <%= link "« Previous", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :index, @context, @resource, Keyword.merge(params, page: @page - 1)), class: "page-link" %>
+          </li>
+          <%= for page_elem <- @list_pages do %>
+            <li class="page-item <%= if page_elem == @page do %>active<% end %>  <%= if page_elem == "..." do %>disabled<% end %>">
+              <%= link page_elem, to: Kaffy.Utils.router().kaffy_resource_path(@conn, :index, @context, @resource, Keyword.merge(params, page: page_elem)), class: "page-link" %>
+            </li>
+          <% end %>
+          <li class="page-item <%= @next_class %>">
+            <%= link "Next »", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :index, @context, @resource, Keyword.merge(params, page: @page + 1)), class: "page-link" %>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<form id="kaffy-filters-form" method="get" style="display:none;">
+  <%= if Kaffy.ResourceSchema.has_field_filters?(@my_resource) do %>
+    <%= for field <- @fields do %>
+        <% {field, filters} = Kaffy.ResourceSchema.kaffy_field_filters(@my_resource[:schema], field) %>
+        <%= if filters do %>
+            <input id="custom-filter-<%= field %>" type="hidden" name="<%= field %>" value="<%= Map.get(@params, to_string(field), "") %>" />
+        <% end %>
+    <% end %>
+  <% end %>
+  <input id="kaffy-filter-search" type="hidden" name="search" value="<%= Map.get(@params, "search", "") %>" />
+  <input id="kaffy-filter-page" type="hidden" name="page" value="<%= Map.get(@params, "page", "1") %>" />
+  <input id="kaffy-filter-limit" type="hidden" name="limit" value="<%= Map.get(@params, "limit", "100") %>" />
+  <input id="kaffy-order-field" type="hidden" name="<%= to_string(:_of) %>" value="<%= Map.get(@params, "_of", "id") %>" />
+  <input id="kaffy-order-way" type="hidden" name="<%= to_string(:_ow) %>" value="<%= Map.get(@params, "_ow", "desc") %>" />
+</form>
+
+
+<% list_actions = Kaffy.ResourceAdmin.list_actions(@my_resource, @conn) || [] %>
+<%= for {action_key, options} <- list_actions do %>
+  <% extra_inputs = Map.get(options, :inputs, []) %>
+  <%= if !Enum.empty?(extra_inputs) do %>
+    <%= form_tag(Kaffy.Utils.router().kaffy_resource_path(@conn, :list_action, @context, @resource, to_string(action_key)), method: :post, class: "list-action", id: "#{action_key}_form") %>
+      <div class="modal fade" id="<%= action_key %>_modal" tabindex="-1" role="dialog" aria-labelledby="<%= action_key %>_modal_label" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="<%= action_key %>_modal_label"><%= options.name %></h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                    <%= for extra <- extra_inputs do %>
+                      <div class="form-group">
+                        <label><%= extra.title %></label>
+                        <input type="text" data-title="<%= extra.title %>" name="kaffy-input[<%= extra.name %>]" value="<%= extra.default %>" class="form-control kaffy-list-action-input" />
+                      </div>
+                    <% end %>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-primary kaffy-list-action-submit" id="<%= action_key %>_submit">Continue</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+    <% end %>
+  </form>
+<% end %>

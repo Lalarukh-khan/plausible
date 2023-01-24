@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><%= Kaffy.Utils.title() %> - Kaffy</title>
+    <link rel="stylesheet" href="/kaffy/assets/vendors/fontawesome/css/all.css">
+    <link rel="stylesheet" href="/kaffy/assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="/kaffy/assets/scss/style.css">
+    <link rel="stylesheet" href="/kaffy/assets/vendors/flatpickr/flatpickr.min.css">
+    <link rel="stylesheet" href="/kaffy/assets/css/kaffy.css">
+    <link rel="shortcut icon" href="/kaffy/assets/images/favicon/favicon-32x32.png" />
+    <%= for css <- Kaffy.Utils.extensions(@conn).stylesheets do %>
+      <%= css %>
+    <% end %>
+    <script src="/kaffy/assets/vendors/js/vendor.bundle.base.js"></script>
+  </head>
+  <body>
+    <div class="container-scroller">
+      <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+        <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+          <%= link to: Kaffy.Utils.router().kaffy_home_path(@conn, :index), class: "navbar-brand brand-logo" do %>
+            <img src="/kaffy/assets/images/logo.png" alt="logo" />
+          <% end %>
+          <%= link to: Kaffy.Utils.router().kaffy_home_path(@conn, :index), class: "navbar-brand brand-logo-mini" do %>
+            <img src="/kaffy/assets/images/logo-mini.png" alt="logo" />
+          <% end %>
+        </div>
+        <div class="navbar-menu-wrapper d-flex align-items-stretch">
+          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <span class="fas fa-bars"></span>
+          </button>
+
+          <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+            <span class="fas fa-bars"></span>
+          </button>
+        </div>
+      </nav>
+
+      <div class="container-fluid page-body-wrapper">
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+          <ul class="nav">
+
+            <%= if Kaffy.Utils.show_dashboard?() do %>
+              <li class="nav-item<%= if @conn.assigns[:context] == nil do %> active<% end %>">
+                <%= link to: Kaffy.Utils.router().kaffy_dashboard_path(@conn, :dashboard), class: "nav-link" do %>
+                  <span class="menu-title">Dashboard</span>
+                  <i class="fas fa-home menu-icon"></i>
+                <% end %>
+              </li>
+            <% end %>
+
+            <% tasks = Kaffy.Tasks.tasks_info() %>
+
+            <%= if not Enum.empty?(tasks) do %>
+              <li class="nav-item">
+                <%= link to: Kaffy.Utils.router().kaffy_task_path(@conn, :index), class: "nav-link" do %>
+                    <span class="menu-title">Tasks</span>
+                    <i class="fas fa-clock menu-icon"></i>
+                <% end %>
+              </li>
+            <% end %>
+
+            <%= for custom_link <- Kaffy.ResourceAdmin.collect_links(@conn, :top) do %>
+              <li class="nav-item">
+                <%= link to: custom_link.url, method: custom_link.method, class: "nav-link", target: custom_link.target do %>
+                  <span class="menu-title"><%= custom_link.name %></span>
+                  <i class="fas fa-<%= custom_link.icon %> menu-icon"></i>
+                <% end %>
+              </li>
+            <% end %>
+
+            <% custom_pages = Kaffy.ResourceAdmin.collect_pages(@conn) %>
+
+            <%= if !Enum.empty?(custom_pages) do %>
+              <li class="nav-item">
+                <a class="nav-link collapsed" href="#kaffy-pages" data-toggle="collapse" aria-expanded="false" aria-controls="kaffy-pages">
+                    <span class="menu-title">Pages</span>
+                    <i class="menu-arrow"></i>
+                    <i class="fas fa-bars menu-icon"></i>
+                </a>
+                <div class="collapse" id="kaffy-pages">
+                  <ul class="nav flex-column sub-menu">
+                    <%= for custom_page <- custom_pages do %>
+                      <li class="nav-item"><%= link custom_page.name, to: Kaffy.Utils.router().kaffy_page_path(@conn, :index, custom_page.slug), class: "nav-link" %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              </li>
+            <% end %>
+
+            <%= for context <- Kaffy.Utils.contexts(@conn) do %>
+                <li class="nav-item<%= if @conn.assigns[:context] == to_string(context) do %> active<% end %>">
+                    <a class="nav-link <%= if @conn.assigns[:context] != to_string(context) do %> collapsed<% end %>"
+                       href="#<%= context %>-context" data-toggle="collapse" aria-expanded="false" aria-controls="<%= context %>-context">
+                        <span class="menu-title"><%= Kaffy.Utils.context_name(@conn, context) %></span>
+                        <i class="menu-arrow"></i>
+                        <i class="fas fa-bars menu-icon"></i>
+                    </a>
+                    <div class="collapse<%= if @conn.assigns[:context] == to_string(context) do %> show<% end %>" id="<%= context %>-context">
+                      <ul class="nav flex-column sub-menu">
+                        <%= for {resource, options} <- Kaffy.Utils.schemas_for_context(@conn, context) do %>
+                            <%= if Kaffy.ResourceAdmin.authorized?(options, @conn) do %>
+                                <li class="nav-item"><%= link Kaffy.ResourceAdmin.plural_name(options), to: Kaffy.Utils.router().kaffy_resource_path(@conn, :index, context, resource), class: "nav-link" %></li>
+                                <%= for custom_link <- Kaffy.ResourceAdmin.custom_links(options, :sub) do %>
+                                    <li class="nav-item"><%= link custom_link.name, to: custom_link.url, class: "nav-link", target: custom_link.target %></li>
+                                <% end %>
+                            <% end %>
+                        <% end %>
+                      </ul>
+                    </div>
+                </li>
+            <% end %>
+          </ul>
+        </nav>
+
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <%= if get_flash(@conn, :success) do %>
+                <div class="alert alert-success">
+                  <i class="fa fa-check"></i><strong>Success: </strong> <%= get_flash(@conn, :success) %>
+                </div>
+            <% end %>
+            <%= if get_flash(@conn, :info) do %>
+                <div class="alert alert-info">
+                  <i class="fa fa-info-circle"></i><strong>Info: </strong> <%= get_flash(@conn, :info) %>
+                </div>
+            <% end %>
+            <%= if get_flash(@conn, :warning) do %>
+                <div class="alert alert-warning">
+                  <i class="fa fa-exclamation-triangle"></i><strong>Warning: </strong> <%= get_flash(@conn, :warning) %>
+                </div>
+            <% end %>
+            <%= if get_flash(@conn, :error) do %>
+                <div class="alert alert-danger">
+                  <i class="fa fa-exclamation-circle"></i><strong>Error: </strong> <%= get_flash(@conn, :error) %>
+                </div>
+            <% end %>
+
+            <%= if Kaffy.Utils.phoenix_version?("1.4.") do %>
+              <%= render(@view_module, @view_template, assigns) %>
+            <% else %>
+              <%= @inner_content %>
+            <% end %>
+          </div>
+
+          <footer class="footer">
+            <div class="d-sm-flex justify-content-center justify-content-sm-between">
+              <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2020 Kaffy. All rights reserved.</span>
+            </div>
+          </footer>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="/kaffy/assets/vendors/flatpickr/flatpickr.min.js"></script>
+    <script src="/kaffy/assets/vendors/chart.js/Chart.min.js"></script>
+    <script src="/kaffy/assets/vendors/js/ckeditor.js"></script>
+    <script src="/kaffy/assets/js/off-canvas.js"></script>
+    <script src="/kaffy/assets/js/hoverable-collapse.js"></script>
+    <script src="/kaffy/assets/js/misc.js"></script>
+    <script src="/kaffy/assets/js/select-all-checkbox.js"></script>
+    <script src="/kaffy/assets/js/phoenix_html.js"></script>
+    <script src="/kaffy/assets/js/dashboard.js"></script>
+    <%= for js <- Kaffy.Utils.extensions(@conn).javascripts do %>
+      <%= js %>
+    <% end %>
+  </body>
+</html>

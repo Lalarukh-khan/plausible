@@ -1,0 +1,41 @@
+<tr class="bg-light">
+    <th>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input select-all kaffy-resource-checkbox" id="kaffy-select-all" name="all-resources" value=""/>
+            <label class="custom-control-label" for="kaffy-select-all"></label>
+        </div>
+    </th>
+    <%= for field <- @fields do %>
+        <% field_name = Kaffy.ResourceSchema.kaffy_field_name(@my_resource[:schema], field) |> String.upcase() %>
+        <% [{order_way, order_field}] = Kaffy.ResourceQuery.get_ordering(@my_resource, @params) %>
+
+        <th>
+            <%= if order_field == elem(field, 0) do %>
+                <a name="<%= field_name %>" class="kaffy-order-field" data-order="<%= if order_way == :desc do %>asc<% else %>desc<% end %>" data-field="<%= elem(field, 0) %>"><%= field_name %> <i class="fas fa-<%= if order_way == :desc do %>arrow-down<% else %>arrow-up<% end %>"></i><a>
+            <% else %>
+                <a name="<%= field_name %>" class="kaffy-order-field" data-order="asc" data-field="<%= elem(field, 0) %>"><%= field_name %><a>
+            <% end %>
+        </th>
+    <% end %>
+</tr>
+
+<%= if Kaffy.ResourceSchema.has_field_filters?(@my_resource) do %>
+    <tr>
+        <th class="bg-light"></th>
+        <%= for {field, index} <- Enum.with_index(@fields) do %>
+            <% {field, filters} = Kaffy.ResourceSchema.kaffy_field_filters(@my_resource[:schema], field) %>
+            <%= if filters do %>
+                <th class="bg-light">
+                    <select class="kaffy-filter custom-select" id="kaffy-field-<%= index %>" data-field-name="<%= field %>">
+                        <option value="">All</option>
+                        <%= for {human, machine} <- filters do %>
+                            <option value="<%= machine %>"<%= if Map.get(@params, to_string(field)) == to_string(machine) do %> selected<% end %>><%= human %></option>
+                        <% end %>
+                    </select>
+                </th>
+            <% else %>
+                <th class="bg-light"></th>
+            <% end %>
+        <% end %>
+    </tr>
+<% end %>

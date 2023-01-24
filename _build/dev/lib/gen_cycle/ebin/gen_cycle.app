@@ -1,0 +1,11 @@
+{application,gen_cycle,
+             [{description,"Erlang behaviour for recurring events"},
+              {vsn,"1.0.3"},
+              {registered,[]},
+              {applications,[kernel,stdlib]},
+              {mod,{gen_cycle_app,[]}},
+              {env,[]},
+              {maintainers,["Adam Rutkowski"]},
+              {licenses,["WTFPL"]},
+              {links,[{"Github","https://github.com/aerosol/gen_cycle"}]},
+              {modules,[gen_cycle,gen_cycle_app,gen_cycle_sup]}]}.

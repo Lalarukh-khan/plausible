@@ -1,0 +1,11 @@
+{application,location,
+             [{applications,[kernel,stdlib,elixir,logger,jason]},
+              {description,"Elixir library for accessing ISO3166-1 (country) and ISO3166-2 (subdivision) data as well as geoname data for cities. Source data comes from the upstream [debian iso-codes](https://salsa.debian.org/iso-codes-team/iso-codes) package.\n"},
+              {modules,['Elixir.Location','Elixir.Location.City',
+                        'Elixir.Location.Country','Elixir.Location.Scraper',
+                        'Elixir.Location.Subdivision',
+                        'Elixir.Mix.Tasks.UpdateEnglishTranslations',
+                        'Elixir.Mix.Tasks.UpdateGeonameData',
+                        'Elixir.Mix.Tasks.UpdateIsoData']},
+              {registered,[]},
+              {vsn,"0.1.0"}]}.

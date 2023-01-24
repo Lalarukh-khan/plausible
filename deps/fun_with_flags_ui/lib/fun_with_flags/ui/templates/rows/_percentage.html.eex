@@ -1,0 +1,28 @@
+<%
+  {gate_type, human_name} = case @gate.type do
+    :percentage_of_time -> {"time", "percent of time"}
+    :percentage_of_actors -> {"actors", "percent of actors"}
+    _ -> {"n/a", "n/a"}
+  end
+%>
+<div id="percentage_gate" class="container fwf-I-hate-grids">
+  <div class="row no-gutters">
+    <div class="col-lg-6 col-md-6 col-sm-5 col-4 text-left">
+      <span class="badge badge-default">% of <%= gate_type %></span>
+      -
+      <%= html_status_for @gate.enabled %> for <%= Utils.as_percentage(@gate.for) %>% of the <%= gate_type %>
+    </div>
+
+    <div class="col-lg-5 col-md-5 col-sm-5 col-5 text-left">
+      raw value: <code><%= @gate.for %></code>
+    </div>
+
+    <div class="col-lg-1 col-md-1 col-sm-2 col-3 text-right">
+      <form action="<%= path(@conn, "/flags/#{@flag.name}/percentage") %>" method="post" class="float-right">
+        <input type="hidden" name="_method" value="DELETE">
+        <input type="hidden" name="_csrf_token" value="<%= @conn.assigns[:csrf_token] %>">
+        <button type="submit" class="btn btn-sm btn-secondary" data-confirm="Are you sure you want to clear the '<%= human_name %>' gate?">Clear</button>
+      </form>
+    </div>
+  </div>
+</div>

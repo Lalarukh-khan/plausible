@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%= _head(conn: @conn, title: @flag.name) %>
+  <body>
+    <nav id="fwf-top-bar" class="navbar navbar-inverse navbar-toggleable-xl">
+      <a class="navbar-brand" href="https://github.com/tompave/fun_with_flags">FunWithFlags</a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="<%= path(@conn, "/flags") %>">all flags</a>
+          </li>
+
+          <span class="navbar-text">
+            &gt;
+          </span>
+
+          <li class="nav-item active">
+            <a class="nav-link" href="<%= path(@conn, "/flags/#{@flag.name}") %>"><%= @flag.name %></a>
+          </li>
+        </ul>
+
+        <a href="<%= path(@conn, "/new") %>" class="btn btn-secondary">New Flag</a>
+      </div>
+    </nav>
+
+    <div class="container mt-3">
+      <h1><%= @flag.name %></h1>
+
+      <div id="boolean_gate" class="row mb-3">
+        <div class="col">
+          <div class="card">
+            <h5 class="card-header">
+              Default state
+            </h5>
+            <%= _boolean_row(conn: @conn, flag: @flag) %>
+          </div>
+        </div>
+      </div>
+
+      <div id="actor_gates" class="row mb-3">
+        <div class="col">
+          <div class="card">
+            <h5 class="card-header">
+              Actors
+            </h5>
+            <ul class="list-group list-group-flush fwf-gate-list">
+              <% actor_gates = Utils.actor_gates(@flag) %>
+
+              <%= for gate <- actor_gates do %>
+                <li class="list-group-item px-0">
+                  <%= _actor_row(conn: @conn, flag: @flag, gate: gate) %>
+                </li>
+              <% end %>
+
+              <%= if Enum.empty?(actor_gates) do %>
+                <li class="list-group-item">
+                  none
+                </li>
+              <% end %>
+
+              <li class="list-group-item">
+                <%= _new_actor_row(conn: @conn, flag: @flag, error_message: assigns[:actor_error_message]) %>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div id="group_gates" class="row mb-3">
+        <div class="col">
+          <div class="card">
+            <h5 class="card-header">
+              Groups
+            </h5>
+            <ul class="list-group list-group-flush fwf-gate-list">
+              <% group_gates = Utils.group_gates(@flag) %>
+
+              <%= for gate <- group_gates do %>
+                <li class="list-group-item px-0">
+                  <%= _group_row(conn: @conn, flag: @flag, gate: gate) %>
+                </li>
+              <% end %>
+
+              <%= if Enum.empty?(group_gates) do %>
+                <li class="list-group-item">
+                  none
+                </li>
+              <% end %>
+
+              <li class="list-group-item">
+                <%= _new_group_row(conn: @conn, flag: @flag, error_message: assigns[:group_error_message]) %>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+      <div id="percentage_gates" class="row mb-3">
+        <div class="col">
+          <div class="card">
+            <h5 class="card-header">
+              Percentage
+            </h5>
+            <ul class="list-group list-group-flush fwf-gate-list">
+              <% percentage_gate = Utils.percentage_gate(@flag) %>
+
+              <%= if is_nil(percentage_gate) do %>
+                <li class="list-group-item">
+                  none
+                </li>
+              <% else %>
+                <li class="list-group-item px-0">
+                  <%= _percentage_row(conn: @conn, flag: @flag, gate: percentage_gate) %>
+                </li>
+              <% end %>
+
+              <li class="list-group-item">
+                <%= _percentage_form_row(conn: @conn, flag: @flag, gate: percentage_gate, error_message: assigns[:percentage_error_message]) %>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div id="danger_zone" class="row mb-3">
+        <div class="col">
+          <div class="card">
+            <h5 class="card-header">
+              Danger Zone
+            </h5>
+            <div class="card-block">
+              <form id="fwf-delete-flag-form" action="<%= path(@conn, "/flags/#{@flag.name}") %>" method="post">
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" name="_csrf_token" value="<%= @conn.assigns[:csrf_token] %>">
+                <button type="submit" class="btn btn-danger" data-confirm="Are you sure you want to completely delete the flag '<%= @flag.name %>'?">Delete Flag</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="<%= path(@conn, "/assets/details.js") %>"></script>
+  </body>
+</html>

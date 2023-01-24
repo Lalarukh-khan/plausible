@@ -1,0 +1,9 @@
+{application,opentelemetry_oban,
+             [{applications,[kernel,stdlib,elixir,oban,opentelemetry_api,
+                             opentelemetry_telemetry,telemetry]},
+              {description,"opentelemetry_oban"},
+              {modules,['Elixir.OpentelemetryOban',
+                        'Elixir.OpentelemetryOban.JobHandler',
+                        'Elixir.OpentelemetryOban.PluginHandler']},
+              {registered,[]},
+              {vsn,"0.2.0-rc.5"}]}.

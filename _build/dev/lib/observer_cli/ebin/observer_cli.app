@@ -1,0 +1,11 @@
+{application,observer_cli,
+             [{applications,[kernel,stdlib,recon]},
+              {description,"observer in shell"},
+              {modules,[observer_cli,observer_cli_application,
+                        observer_cli_escriptize,observer_cli_ets,
+                        observer_cli_help,observer_cli_inet,observer_cli_lib,
+                        observer_cli_mnesia,observer_cli_plugin,
+                        observer_cli_port,observer_cli_process,
+                        observer_cli_store,observer_cli_system]},
+              {registered,[]},
+              {vsn,"1.7.3"}]}.

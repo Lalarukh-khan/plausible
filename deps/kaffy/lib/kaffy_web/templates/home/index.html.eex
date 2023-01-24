@@ -1,0 +1,47 @@
+<div class="page-header">
+    <h3 class="page-title">Dashboard </h3>
+    <nav aria-label="breadcrumb">
+    <ul class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">
+        <span>
+            Overview <i class="fas fa-feather icon-sm text-primary align-middle"></i>
+        </span>
+        </li>
+    </ul>
+    </nav>
+</div>
+
+<% widgets = Kaffy.ResourceAdmin.collect_widgets(@conn) %>
+
+<%= if Enum.empty?(widgets) do %>
+
+    <div class="row mt-3">
+        <div class="col-md-12 text-center">
+            <h4>A powerfully simple admin package for phoenix applications.</h4>
+            <h4>You can add widgets to this page by defining <code>widgets/2</code> in your admin modules.</h4>
+        </div>
+    </div>
+
+<% else %>
+
+    <div class="row mt-1 row-cols-1 row-cols-md-2 row-cols-sm-1 row-cols-xs-1">
+        <%= for widget <- widgets do %>
+            <%= if widget.type == "text" do %>
+                <%= render KaffyWeb.HomeView, "_text.html", widget: widget %>
+            <% end %>
+
+            <%= if widget.type == "chart" do %>
+                <%= render KaffyWeb.HomeView, "_chart.html", widget: widget %>
+            <% end %>
+
+            <%= if widget.type == "progress" do %>
+                <%= render KaffyWeb.HomeView, "_progress.html", widget: widget %>
+            <% end %>
+
+            <%= if widget.type == "tidbit" do %>
+                <%= render KaffyWeb.HomeView, "_tidbit.html", widget: widget %>
+            <% end %>
+        <% end %>
+    </div>
+
+<% end %>

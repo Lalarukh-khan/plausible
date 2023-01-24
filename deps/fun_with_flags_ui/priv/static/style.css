@@ -1,0 +1,41 @@
+
+/**
+
+colors
+#373f52; hexdoc sidebar
+
+#714a94; hex package name
+#4e2a8e; elixir-lang link
+*/
+
+#fwf-top-bar {
+  background-color: #714a94;
+}
+
+
+ul.fwf-gate-list > li:first-child {
+    border-top: none;
+}
+
+form.fwf-inline-toggle {
+    display: inline-block;
+}
+
+
+span.fwf-global-flag-status {
+    font-size: 1.75rem;
+}
+
+div.container.fwf-I-hate-grids {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+}
+
+div.input-group.fwf-wide-input {
+  width: 420px;
+}
+
+button {
+  cursor: pointer;
+}

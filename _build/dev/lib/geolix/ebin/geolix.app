@@ -1,0 +1,13 @@
+{application,geolix,
+             [{applications,[kernel,stdlib,elixir,logger]},
+              {description,"IP information lookup provider"},
+              {modules,['Elixir.Geolix','Elixir.Geolix.Adapter',
+                        'Elixir.Geolix.Adapter.Fake',
+                        'Elixir.Geolix.Adapter.Fake.Storage',
+                        'Elixir.Geolix.Application',
+                        'Elixir.Geolix.Database.Loader',
+                        'Elixir.Geolix.Database.Supervisor',
+                        'Elixir.Geolix.Supervisor']},
+              {registered,[]},
+              {vsn,"2.0.0"},
+              {mod,{'Elixir.Geolix.Application',[]}}]}.

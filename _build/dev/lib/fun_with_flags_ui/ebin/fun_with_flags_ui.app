@@ -1,0 +1,11 @@
+{application,fun_with_flags_ui,
+             [{applications,[kernel,stdlib,elixir,logger,plug,fun_with_flags]},
+              {description,"FunWithFlags.UI, a web dashboard for the FunWithFlags Elixir package.\n"},
+              {modules,['Elixir.FunWithFlags.Actor.FunWithFlags.UI.SimpleActor',
+                        'Elixir.FunWithFlags.UI',
+                        'Elixir.FunWithFlags.UI.Router',
+                        'Elixir.FunWithFlags.UI.SimpleActor',
+                        'Elixir.FunWithFlags.UI.Templates',
+                        'Elixir.FunWithFlags.UI.Utils']},
+              {registered,[]},
+              {vsn,"0.8.0"}]}.

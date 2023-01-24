@@ -1,0 +1,25 @@
+<table class="table table-striped">
+    <thead>
+        <%= render KaffyWeb.ResourceView, "_table_header.html", my_resource: @my_resource, fields: @fields, params: @params %>
+    </thead>
+
+    <tbody>
+        <%= for entry <- @entries do %>
+            <tr>
+                <td>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input select-item kaffy-resource-checkbox" id="kaffy-select-<%= entry.id %>" name="resource" value="<%= entry.id %>"/>
+                        <label class="custom-control-label" for="kaffy-select-<%= entry.id %>"></label>
+                    </div>
+                </td>
+                <%= for {field, index} <- Enum.with_index(@fields) do %>
+                    <%= if index == 0 do %>
+                        <td><%= link Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, field), to: Kaffy.Utils.router().kaffy_resource_path(@conn, :show, @context, @resource, entry) %></td>
+                    <% else %>
+                        <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, field) %></td>
+                    <% end %>
+                <% end %>
+            </tr>
+        <% end %>
+    </tbody>
+</table>
